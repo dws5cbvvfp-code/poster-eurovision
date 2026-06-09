@@ -49,7 +49,7 @@ window.addEventListener('load', function() {
 
     project.importSVG('poster.svg', function(item) {
         const textPaths = new CompoundPath();
-        ['welcome', 'to', 'the', 'riot'].forEach(id => {
+        ['welcome', 'to', 'the', 'riot', 'logo', 'info'].forEach(id => {
             const group = item.children[id];
             if (group) {
                 group.children.forEach(path => {
