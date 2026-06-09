@@ -21,8 +21,8 @@ window.addEventListener('load', function() {
         poster.fitBounds(view.bounds, false);
         poster.position = view.center;
 
-        // Cerca il cuore in tutto il progetto, che è più robusto
-        const cuore = project.getItem({ id: 'cuore' });
+        // Cerca il cuore in tutto il progetto usando il nome (l'id dell'SVG viene mappato su 'name' in Paper.js)
+        const cuore = project.getItem({ name: 'cuore' });
         if (!cuore) {
             console.error("Errore: cuore non trovato nel progetto!");
             return;
