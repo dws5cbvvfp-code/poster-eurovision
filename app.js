@@ -10,6 +10,17 @@ window.addEventListener('load', function() {
     });
 });
 
+const config = {
+    horizontalSpacing: 40,
+    verticalSpacing: 35,
+};
+
 function initGrid(symbol) {
-    console.log("Grid setup placeholder");
+    const { width, height } = view.bounds;
+    for (let y = 0; y < height; y += config.verticalSpacing) {
+        const offset = (y / config.verticalSpacing) % 2 === 0 ? 0 : config.horizontalSpacing / 2;
+        for (let x = -offset; x < width + config.horizontalSpacing; x += config.horizontalSpacing) {
+            symbol.place(new Point(x, y));
+        }
+    }
 }
