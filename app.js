@@ -4,8 +4,8 @@ const noise = new SimplexNoise();
 const config = {
     horizontalSpacing: 50,
     verticalSpacing: 45,
-    heartSize: 24,
-    noiseScale: 0.005,
+    heartSize: 20,
+    noiseScale: 0.004,
     noiseAmplitude: 0.6,
 };
 
@@ -13,18 +13,14 @@ let cuori = [];
 
 window.addEventListener('load', function() {
     paper.setup('canvas');
-    project.importSVG('poster.svg', function(poster) {
-        poster.fitBounds(view.bounds, true);
-        poster.position = view.center;
 
-        const cuore = poster.getItem({ id: 'cuore' });
-        if (!cuore) return;
-        cuore.remove();
+    const cuore = new Path('M20.1,684.1c-.8-.8-1.8-1.2-2.7-2.2-1.1-1.1-1.4-2.7-.9-4.2.3-1,1.3-1.7,2.4-1.7s1.2.5,1.2,1.2c.2-.9.6-1.5,1.4-1.9.5-.3,1.1-.4,1.7-.3,1,0,1.7.8,1.9,1.8.3,1.5-.6,2.9-1.7,4l-1.4,1.3c-.4.4-.7.7-1,1.2l-.4.7h-.5v.1Z');
+    cuore.fillColor = new Color(1, 1, 1);
+    cuore.translate(-cuore.bounds.center.x, -cuore.bounds.center.y);
+    cuore.scale(config.heartSize / cuore.bounds.width);
 
-        cuore.scale(config.heartSize / cuore.bounds.width);
-        const symbol = new SymbolDefinition(cuore);
-        initGrid(symbol);
-    });
+    const symbol = new SymbolDefinition(cuore);
+    initGrid(symbol);
 });
 
 function initGrid(symbol) {
