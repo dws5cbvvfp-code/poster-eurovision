@@ -14,13 +14,6 @@ const SVG_H = 841.8;
 const HEART_SVG_X = 20;
 const HEART_SVG_Y = 684;
 
-const COLORS = [
-    new Color(188/255, 146/255, 1),     // #bc92ff
-    new Color(181/255, 97/255, 1),      // #b561ff
-    new Color(48/255, 95/255, 242/255), // #305ff2
-    new Color(0, 12/255, 239/255),      // #000cef
-];
-
 let cuori = [];
 
 function svgToScreen(svgX, svgY) {
@@ -64,7 +57,6 @@ function initGrid(symbol) {
             const x = start.x + offset + col * config.horizontalSpacing;
             const y = start.y - row * config.verticalSpacing;
             const instance = symbol.place(new Point(x, y));
-            instance.fillColor = COLORS[(row + col) % COLORS.length];
             cuori.push(instance);
             col++;
         }
@@ -78,7 +70,7 @@ function updateNoise(event) {
         const n = noise.noise3D(
             c.position.x * config.noiseScale,
             c.position.y * config.noiseScale,
-            event.time * 0.1
+            event.time * 0.5
         );
         const scale = Math.max(0.1, 1 + n * config.noiseAmplitude);
         c.scaling = new Point(scale, scale);
