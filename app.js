@@ -9,6 +9,13 @@ const config = {
     noiseAmplitude: 0.6,
 };
 
+const COLORS = [
+    new Color(188/255, 146/255, 255/255),
+    new Color(181/255,  97/255, 255/255),
+    new Color( 48/255,  95/255, 242/255),
+    new Color(  0/255,  12/255, 239/255),
+];
+
 const SVG_W = 595.7;
 const SVG_H = 841.8;
 const HEART_SVG_X = 20;
@@ -65,7 +72,22 @@ function initGrid(symbol) {
     view.onFrame = updateNoise;
 }
 
+function getColor(t) {
+    const duration = 6;
+    const phase = (t / duration * COLORS.length) % COLORS.length;
+    const idx = Math.floor(phase);
+    const frac = phase - idx;
+    const c1 = COLORS[idx];
+    const c2 = COLORS[(idx + 1) % COLORS.length];
+    return new Color(
+        c1.red + (c2.red - c1.red) * frac,
+        c1.green + (c2.green - c1.green) * frac,
+        c1.blue + (c2.blue - c1.blue) * frac
+    );
+}
+
 function updateNoise(event) {
+    const color = getColor(event.time);
     cuori.forEach(c => {
         const n = noise.noise3D(
             c.position.x * config.noiseScale,
@@ -74,5 +96,6 @@ function updateNoise(event) {
         );
         const scale = Math.max(0.1, 1 + n * config.noiseAmplitude);
         c.scaling = new Point(scale, scale);
+        c.fillColor = color;
     });
 }
