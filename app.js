@@ -1,14 +1,14 @@
 paper.install(window);
-window.onload = function() {
+window.addEventListener('load', function() {
     paper.setup('canvas');
-    project.importSVG('poster.svg', function(item) {
-        // Estrai il cuore e inizializza
+    project.importSVG('poster.svg', function() {
         const cuore = project.getItem({ id: 'cuore' });
+        if (!cuore) return;
         cuore.remove();
         const symbol = new SymbolDefinition(cuore);
         initGrid(symbol);
     });
-};
+});
 
 function initGrid(symbol) {
     console.log("Grid setup placeholder");
