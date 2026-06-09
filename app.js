@@ -46,7 +46,24 @@ window.addEventListener('load', function() {
     cuore.scale(config.heartSize / cuore.bounds.width);
 
     const symbol = new SymbolDefinition(cuore);
-    initGrid(symbol);
+
+    project.importSVG('poster.svg', function(item) {
+        const textPaths = new CompoundPath();
+        ['welcome', 'to', 'the', 'riot'].forEach(id => {
+            const group = item.children[id];
+            if (group) {
+                group.children.forEach(path => {
+                    if (path instanceof Path) {
+                        textPaths.addChild(path.clone());
+                    }
+                });
+            }
+        });
+        textPaths.visible = false;
+        
+        initGrid(symbol, textPaths);
+        item.remove();
+    });
 });
 
 function lerpColor(t, a, b) {
@@ -57,7 +74,7 @@ function lerpColor(t, a, b) {
     );
 }
 
-function initGrid(symbol) {
+function initGrid(symbol, textPaths) {
     const start = svgToScreen(HEART_SVG_X, HEART_SVG_Y);
     const { width, height } = view.bounds;
     let maxDist = 0;
@@ -68,6 +85,12 @@ function initGrid(symbol) {
         while (start.x + offset + col * config.horizontalSpacing < width + config.horizontalSpacing) {
             const x = start.x + offset + col * config.horizontalSpacing;
             const y = start.y - row * config.verticalSpacing;
+
+            if (textPaths && textPaths.contains(new Point(x, y))) {
+                col++;
+                continue;
+            }
+
             const instance = symbol.place(new Point(x, y));
             const dist = Math.sqrt((x - start.x) ** 2 + (y - start.y) ** 2);
             instance._t = dist;
