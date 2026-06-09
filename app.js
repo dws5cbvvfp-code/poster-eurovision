@@ -17,7 +17,7 @@ const config = {
     verticalSpacing: 35,
     baseScale: 0.5,
     noiseScale: 0.01,
-    noiseAmplitude: 0.3
+    noiseAmplitude: 0.3,
 };
 
 let cuori = [];
@@ -35,10 +35,13 @@ function initGrid(symbol) {
 }
 
 function updateNoise(event) {
-    const t = event.time;
     cuori.forEach(c => {
-        let n = noise.noise2D(c.position.x * config.noiseScale, c.position.y * config.noiseScale);
-        let scale = config.baseScale + (n * config.noiseAmplitude);
+        const n = noise.noise3D(
+            c.position.x * config.noiseScale,
+            c.position.y * config.noiseScale,
+            event.time * 0.1
+        );
+        const scale = Math.max(0, config.baseScale + n * config.noiseAmplitude);
         c.scaling = new Point(scale, scale);
     });
 }
