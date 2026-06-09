@@ -4,55 +4,64 @@ const noise = new SimplexNoise();
 const config = {
     horizontalSpacing: 50,
     verticalSpacing: 45,
-    heartSize: 24,
-    noiseScale: 0.005,
+    heartSize: 20,
+    noiseScale: 0.004,
     noiseAmplitude: 0.6,
-    speed: 0.25, // 2.5x rispetto a 0.1
 };
+
+const SVG_W = 595.7;
+const SVG_H = 841.8;
+const HEART_SVG_X = 20;
+const HEART_SVG_Y = 684;
 
 let cuori = [];
 
+function svgToScreen(svgX, svgY) {
+    const winW = window.innerWidth;
+    const winH = window.innerHeight;
+    const imgAspect = SVG_W / SVG_H;
+    const winAspect = winW / winH;
+    let scale, ox, oy;
+    if (winAspect > imgAspect) {
+        scale = winH / SVG_H;
+        ox = (winW - SVG_W * scale) / 2;
+        oy = 0;
+    } else {
+        scale = winW / SVG_W;
+        ox = 0;
+        oy = (winH - SVG_H * scale) / 2;
+    }
+    return new Point(ox + svgX * scale, oy + svgY * scale);
+}
+
 window.addEventListener('load', function() {
     paper.setup('canvas');
-    project.importSVG('poster.svg', function(poster) {
-        console.log("SVG caricato con successo");
-        
-        // Adatta il poster intero senza tagliarlo
-        poster.fitBounds(view.bounds, false);
-        poster.position = view.center;
 
-        // Cerca il cuore in tutto il progetto usando il nome (l'id dell'SVG viene mappato su 'name' in Paper.js)
-        const cuore = project.getItem({ name: 'cuore' });
-        if (!cuore) {
-            console.error("Errore: cuore non trovato nel progetto!");
-            return;
-        }
-        console.log("Cuore trovato:", cuore);
+    const cuore = new Path('M20.1,684.1c-.8-.8-1.8-1.2-2.7-2.2-1.1-1.1-1.4-2.7-.9-4.2.3-1,1.3-1.7,2.4-1.7s1.2.5,1.2,1.2c.2-.9.6-1.5,1.4-1.9.5-.3,1.1-.4,1.7-.3,1,0,1.7.8,1.9,1.8.3,1.5-.6,2.9-1.7,4l-1.4,1.3c-.4.4-.7.7-1,1.2l-.4.7h-.5v.1Z');
+    cuore.fillColor = new Color(1, 1, 1);
+    cuore.translate(-cuore.bounds.center.x, -cuore.bounds.center.y);
+    cuore.scale(config.heartSize / cuore.bounds.width);
 
-        // Cambia colore in blu e imposta la dimensione di riferimento
-        cuore.fillColor = new Color('#000cef');
-        cuore.scale(config.heartSize / cuore.bounds.width);
-
-        // Crea il simbolo (questo rimuove automaticamente l'originale dal progetto)
-        const symbol = new SymbolDefinition(cuore);
-        console.log("Simbolo creato con successo");
-
-        initGrid(symbol);
-    });
+    const symbol = new SymbolDefinition(cuore);
+    initGrid(symbol);
 });
 
 function initGrid(symbol) {
+    const start = svgToScreen(HEART_SVG_X, HEART_SVG_Y);
     const { width, height } = view.bounds;
-    let count = 0;
-    for (let y = 0; y < height; y += config.verticalSpacing) {
-        const offset = (y / config.verticalSpacing) % 2 === 0 ? 0 : config.horizontalSpacing / 2;
-        for (let x = -offset; x < width + config.horizontalSpacing; x += config.horizontalSpacing) {
+    let row = 0;
+    while (start.y - row * config.verticalSpacing > 0) {
+        const offset = row % 2 === 0 ? 0 : config.horizontalSpacing / 2;
+        let col = 0;
+        while (start.x + offset + col * config.horizontalSpacing < width + config.horizontalSpacing) {
+            const x = start.x + offset + col * config.horizontalSpacing;
+            const y = start.y - row * config.verticalSpacing;
             const instance = symbol.place(new Point(x, y));
             cuori.push(instance);
-            count++;
+            col++;
         }
+        row++;
     }
-    console.log("Griglia creata con", count, "cuori");
     view.onFrame = updateNoise;
 }
 
@@ -61,7 +70,7 @@ function updateNoise(event) {
         const n = noise.noise3D(
             c.position.x * config.noiseScale,
             c.position.y * config.noiseScale,
-            event.time * config.speed
+            event.time * 0.1
         );
         const scale = Math.max(0.1, 1 + n * config.noiseAmplitude);
         c.scaling = new Point(scale, scale);
